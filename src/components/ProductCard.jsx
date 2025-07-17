@@ -8,7 +8,7 @@ export default function ProductCard({ product, onAdd }) {
   return (
     <article className="product-card">
       <img
-        src={image}
+        src={`/${image}`}
         alt={name}
         className="product-card__image"
         loading="lazy"
