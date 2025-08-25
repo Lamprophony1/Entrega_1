@@ -117,3 +117,90 @@ Este proyecto es una **aplicación de frontend** construida en React que simula 
 ## 🧪 Bonus
 - El código está preparado para escalar fácilmente.
 - Si se desea agregar autenticación o backend real, puede integrarse sin romper la estructura actual.
+
+---
+
+# 🖥️ Backend — Java + Spring Boot
+
+Este proyecto incorpora un **backend basado en microservicios** desarrollado con Java y el ecosistema Spring. La arquitectura se compone de:
+
+1. **Eureka Server** – Registro de servicios (puerto `8761`).
+2. **API Gateway** – Punto de entrada único que enruta a los microservicios (puerto `8080`).
+3. **Buscador Service** – Gestiona los ítems de la tienda y permite buscarlos por cualquiera de sus atributos.
+4. **Operador Service** – Registra compras y consulta al buscador para validar stock.
+
+## ✅ Requisitos previos
+
+- [Java JDK 17+](https://adoptium.net/) 
+- [Maven 3.9+](https://maven.apache.org/)
+- Node.js 22+ para el frontal.
+
+Comprueba las instalaciones con:
+
+```bash
+java -version
+mvn -version
+node -v
+```
+
+## 🗄️ Bases de datos
+
+Por defecto ambos microservicios utilizan **H2 en memoria**, por lo que no es necesario instalar nada adicional. Para usar MySQL o PostgreSQL:
+
+1. Instalar el motor correspondiente.
+2. Crear las bases de datos:
+   ```sql
+   -- MySQL
+   CREATE DATABASE buscadordb;
+   -- PostgreSQL
+   CREATE DATABASE operadordb;
+   ```
+3. Actualizar las propiedades `spring.datasource.url`, `username` y `password` en:
+   - `backend/buscador-service/src/main/resources/application.yml`
+   - `backend/operador-service/src/main/resources/application.yml`
+
+## 🚀 Ejecución de los servicios
+
+En terminales independientes y desde la raíz del proyecto, ejecutar:
+
+```bash
+# 1. Servidor de registro
+mvn -f backend/eureka-server spring-boot:run
+
+# 2. Microservicio buscador
+mvn -f backend/buscador-service spring-boot:run
+
+# 3. Microservicio operador
+mvn -f backend/operador-service spring-boot:run
+
+# 4. Gateway
+mvn -f backend/gateway spring-boot:run
+```
+
+Cada servicio se registrará automáticamente en Eureka y el gateway expondrá la API en `http://localhost:8080`.
+
+## 📡 Endpoints principales
+
+### Buscador (`/items`)
+- `POST /items` – Crear ítem.
+- `GET /items` – Listar todos.
+- `GET /items/{id}` – Obtener por ID.
+- `PUT /items/{id}` – Actualizar.
+- `DELETE /items/{id}` – Eliminar.
+- `GET /items/search?name=...&description=...&minPrice=...&maxPrice=...&inStock=...` – Búsqueda avanzada.
+
+### Operador (`/orders`)
+- `POST /orders` – Registrar compra (valida stock en el buscador).
+- `GET /orders` – Listar compras.
+- `GET /orders/{id}` – Detalle de compra.
+
+## 🖥️ Frontend
+
+El frontal React continúa funcionando como antes:
+
+```bash
+npm install
+npm run dev
+```
+
+Con los servicios en marcha, la aplicación completa estará disponible en `http://localhost:5173` consumiendo el backend a través del gateway.
